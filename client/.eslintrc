@@ -15,6 +15,11 @@
     "sourceType": "module"
   },
   "plugins": ["@typescript-eslint/eslint-plugin", "react"],
+  "settings": {
+    "react": {
+      "version": "detect" // React 버전 자동 감지
+    }
+  },
   "rules": {
     "react/self-closing-comp": [
       "error",

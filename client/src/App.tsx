@@ -1,11 +1,13 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
+import { ThemeProvider } from "@mui/material";
 import Router from "./Router";
+import theme from "./theme";
 
 function App() {
-  const [count, setCount] = useState(0);
-
-  return <Router></Router>;
+  return (
+    <ThemeProvider theme={theme}>
+      <Router />
+    </ThemeProvider>
+  );
 }
 
 export default App;
