@@ -3,8 +3,8 @@
 * $ npm install
 * env.example 파일을 .env파일로 바꾸고 환경변수 설정, 아래 환경변수 설정 설명 참조
 * 데이터베이스 설정
-  데이터베이스 생성 
-  $ npx sequelize db:migrate 로 테이블 생성, 테이블이 잘 생성됐는지 확인!
+  * 데이터베이스 생성 
+  * $ npx sequelize db:migrate 로 테이블 생성, 테이블이 잘 생성됐는지 확인!
 * 각자 발급받은 cert.pem, key.pem 파일 server 폴더에 넣기
 * $ npm run start 로 서버시작! $ npm run dev는 nodemon으로 서버시작
 * https://localhost:PORT 로 접속!
