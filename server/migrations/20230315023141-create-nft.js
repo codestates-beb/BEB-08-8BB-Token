@@ -17,6 +17,15 @@ module.exports = {
           key: 'id'
         }
       },
+      title: {
+        type: Sequelize.STRING
+      },
+      img_url: {
+        type: Sequelize.STRING
+      },
+      comment: {
+        type: Sequelize.STRING
+      },
       token_id: {
         type: Sequelize.INTEGER
       },
@@ -30,7 +39,7 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
-      }
+      },      
     });
   },
   async down(queryInterface, Sequelize) {

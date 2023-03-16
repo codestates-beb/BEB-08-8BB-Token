@@ -23,8 +23,11 @@ module.exports = (sequelize, DataTypes) => {
         key: 'id'
       }
     },
+    title: DataTypes.STRING,
+    img_url: DataTypes.STRING,
+    comment: DataTypes.STRING,
     token_id: DataTypes.INTEGER,
-    tx_hash: DataTypes.STRING
+    tx_hash: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'nft',
