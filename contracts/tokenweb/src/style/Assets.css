@@ -1,0 +1,58 @@
+.asset {
+  display: inline-block;
+  box-shadow: rgb(0 0 0 / 8%) 0px 4px 15px;
+  transition: box-shadow 0.25s ease-in-out 0s;
+  border-radius: 10px;
+  width: 270px;
+  height: 385px;
+  overflow: hidden;
+  margin-right: 15px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.asset:hover {
+  box-shadow: rgb(0 0 0 / 15%) 0px 6px 25px;
+  /* transition: all 0.1s ease 0s; */
+}
+
+.asset a {
+  display: block;
+  height: 100%;
+}
+
+.thumbnail-wrapper {
+  overflow: hidden;
+  height: 270px;
+}
+
+img.thumbnail {
+  width: 100%;  
+  transition: transform 0.4s ease 0s;
+}
+
+img.thumbnail:hover {
+  transform: scale(1.1);
+}
+
+.asset-info-wrapper {
+  padding: 15px;
+}
+
+.token-id {
+  font-weight: 600;
+  line-height: 20px;
+  color: rgb(4, 17, 29);
+  margin-top: 5px;
+  margin-bottom: 15px;
+  text-overflow: ellipsis; 
+  white-space: nowrap; 
+  overflow: hidden;
+}
+
+.current-price {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  color: rgb(4, 17, 29);
+}

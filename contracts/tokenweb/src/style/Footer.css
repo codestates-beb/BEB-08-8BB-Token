@@ -1,0 +1,35 @@
+.Footer{
+    width: 100%;
+    background-color: rgb(216, 130, 130);
+    padding-top:5%;
+}
+
+#Bottom{
+    padding-bottom: 5%;
+    display: flex;
+    column-gap: 20%;
+    grid-template-columns: auto auto auto auto;
+    justify-content: center;
+    align-items: center;
+}
+
+.section{
+    grid-column: auto;
+    text-align: center;
+    vertical-align: middle;
+
+}
+
+#part1{
+    margin-top:15px;
+}
+
+#description{
+    width:300px;
+}
+
+#part2{
+    display: grid;
+    align-items: center;
+}
+
