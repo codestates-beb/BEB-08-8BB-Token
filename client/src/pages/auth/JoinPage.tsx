@@ -1,10 +1,7 @@
 import * as React from "react";
 import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import Link from "@mui/material/Link";
+import { Link } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -42,19 +39,12 @@ export default function JoinPage() {
                 required
                 fullWidth
                 id="name"
-                label="Username"
+                label="Nickname"
                 autoFocus
               />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                required
-                fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
-              />
+              <Button type="submit" variant="contained" sx={{ mt: 3, mb: 2 }}>
+                Is duplicate?
+              </Button>
             </Grid>
             <Grid item xs={12}>
               <TextField
@@ -78,9 +68,7 @@ export default function JoinPage() {
           </Button>
           <Grid container justifyContent="flex-end">
             <Grid item>
-              <Link href="/auth/login" variant="body2">
-                Already have an account? Sign in
-              </Link>
+              <Link to="/auth/login">Already have an account? Sign in</Link>
             </Grid>
           </Grid>
         </Box>

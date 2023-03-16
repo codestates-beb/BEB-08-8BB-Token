@@ -1,7 +1,7 @@
 import React from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import Link from "@mui/material/Link";
+import { Link } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
@@ -26,18 +26,9 @@ export default function LoginPage() {
           required
           fullWidth
           id="email"
-          label="Email Address"
-          name="email"
-          autoComplete="email"
-          autoFocus
-        />
-        <TextField
-          margin="normal"
-          label="Email Address"
-          required
-          fullWidth
-          name="email"
-          autoComplete="email"
+          label="Nickname"
+          name="nickname"
+          autoComplete="nickname"
           autoFocus
         />
         <TextField
@@ -62,7 +53,7 @@ export default function LoginPage() {
             Not a 8BBTOken user?
           </Grid>
           <Grid item>
-            <Link href="/auth/join" rel="stylesheet">
+            <Link to="/auth/join" rel="stylesheet">
               Sign Up
             </Link>
           </Grid>
