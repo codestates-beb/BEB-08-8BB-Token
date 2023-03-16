@@ -1,6 +1,7 @@
 import { Box } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import Header from "./Header";
+import Footer from "../Footer";
 
 export default function BaseLayout() {
   return (
@@ -9,6 +10,7 @@ export default function BaseLayout() {
       <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1 }}>
         <Outlet />
       </Box>
+      <Footer />
     </Box>
   );
 }

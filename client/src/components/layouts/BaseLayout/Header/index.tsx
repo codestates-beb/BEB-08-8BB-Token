@@ -33,7 +33,7 @@ export default function Header() {
             <UserProfile />
           ) : (
             <Button variant="contained" onClick={handleLogin}>
-              LOGIN
+              <Link to="/auth/login">LOGIN</Link>
             </Button>
           )}
         </Toolbar>
