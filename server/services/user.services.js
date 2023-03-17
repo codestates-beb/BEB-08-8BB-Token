@@ -1,26 +1,41 @@
 const { user } = require('../models');
-const { post } = require('../models');
-const { nft } = require('../models');
 
 module.exports = {
-  test: () => {
-    // user.create({
-    //   nickname: 'John2',
-    //   password: '11111'
-    // }).then(user => {
-    //   console.log("User's auto-generated ID:", user.id);
-    // });
-    // post.create({
-    //   user_id: 1,
-    //   title: 'test',
-    //   content: 'test!!'
-    // }).then(user => {
-    //   console.log("Post's auto-generated ID:", user.id);
-    // });
-    nft.create({
-      user_id: 1,
-    }).then(user => {
-      console.log("User's auto-generated ID:", user.id);
-    });
+  user_joinById_get:async (nickname) => {
+    try {
+      const result = await user.findAll({
+        where: {nickname: nickname}
+      });
+      return result;
+    } catch (e) {
+      console.log("user_joinById_get err", e);
+      return null;
+    }
   },
+  user_join_post: async (nickname, password) => {
+    try {
+      const result = await user.create({
+        nickname: nickname,
+        password: password,
+        address: "0x0000",
+        token_amount: 0,
+        eth_amount: 0
+      });
+      return result
+    } catch (e) {
+      console.log("user_join_post err", e);
+      return null;
+    }
+  },
+  user_login_post: async (nickname, password) => {
+    try {
+      const result = await user.findOne({
+        where: {nickname: nickname, password: password}
+      });
+      return result;
+    } catch (e) {
+      console.log("user_login_post err", e);
+      return null;
+    }
+  }
 }
