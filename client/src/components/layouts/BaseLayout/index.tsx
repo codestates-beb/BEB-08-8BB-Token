@@ -7,7 +7,7 @@ export default function BaseLayout() {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <Header />
-      <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1 }}>
+      <Box>
         <Outlet />
       </Box>
       <Footer />

@@ -1,6 +1,5 @@
 import { Outlet } from "react-router-dom";
-import { Container, Button, Box, Toolbar } from "@mui/material";
-import { useState } from "react";
+import { Container, Box, Toolbar } from "@mui/material";
 import { Link } from "react-router-dom";
 
 import Footer from "./Footer";

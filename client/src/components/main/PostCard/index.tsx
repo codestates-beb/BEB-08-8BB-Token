@@ -12,7 +12,12 @@ export default function PostCard() {
   return (
     <Card
       sx={{
-        ":hover": {},
+        border: 2,
+        borderColor: "transparent",
+        ":hover": {
+          borderColor: "primary.main",
+          boxShadow: 3,
+        },
       }}
     >
       <CardHeader
