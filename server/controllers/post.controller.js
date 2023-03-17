@@ -24,11 +24,18 @@ module.exports = {
     }
   },
   post_main_post: async (req, res) => {
-    const result = await post.post_main_post(req.query.title, req.query.content, req.query.userId);
+    //로그인 체크
+    if(!req.session.userData 
+      || req.session.userData.id !== req.body.user_id
+      ) {
+      res.status(401).send({message: "error. not logged in"});
+      return;
+    }
+    const result = await post.post_main_post(req.body.title, req.body.content, req.body.userId);
     if(result) {
       res.status(200).send({message: "success"});
     } else {
-      res.status(400).send({message: "error", errData: result});
+      res.status(400).send({message: "error"});
     }
   }
 }
