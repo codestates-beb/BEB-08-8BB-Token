@@ -36,7 +36,6 @@ export default function UserProfile() {
   const handleCloseMenu = (e: React.MouseEvent<HTMLElement>) => {
     const path = e.currentTarget.dataset.path;
     setAnchorEl(null);
-    console.log(path);
     if (path) navigate(path);
   };
 
