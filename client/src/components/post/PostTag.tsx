@@ -1,11 +1,14 @@
 import { Chip, ChipProps } from "@mui/material";
 import { grey } from "@mui/material/colors";
 
-type PostTagProps = ChipProps;
+interface PostTagProps extends Omit<ChipProps, "onDelete"> {
+  onDelete(label?: ChipProps["label"]): void;
+}
 
 export default function PostTag({ onDelete, ...props }: PostTagProps) {
-  const handleDelete = () => {
-    if (onDelete) onDelete(props.label);
+  const handleDelete = (callback: PostTagProps["onDelete"]) => {
+    if (callback) return () => callback(props.label);
+    return undefined;
   };
   return (
     <Chip
@@ -15,7 +18,7 @@ export default function PostTag({ onDelete, ...props }: PostTagProps) {
         bgcolor: grey[100],
         fontWeight: "bold",
       }}
-      onDelete={handleDelete}
+      onDelete={handleDelete(onDelete)}
       {...props}
     />
   );

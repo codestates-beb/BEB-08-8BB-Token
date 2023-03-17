@@ -29,7 +29,7 @@
       }
     ],
     "react/prop-types": 0,
-    "no-unused-vars": "warn", // 사용하지 않은 변수에 대해서 경고
+    "no-unused-vars": 0, // 사용하지 않은 변수에 대해서 경고
     "react/react-in-jsx-scope": 0 // jsx문법을 사용할때 React를 import 해야한다.
   }
 }
