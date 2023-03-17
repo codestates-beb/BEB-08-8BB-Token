@@ -5,14 +5,11 @@ import {
   MenuItem,
   Typography,
   Card,
-  Button,
-  CardActions,
   CardContent,
   CardHeader,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import React, { useState } from "react";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 
 export default function CommentCard() {
   const [moreEl, setMoreEl] = useState<HTMLElement | null>(null);

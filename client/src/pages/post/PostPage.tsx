@@ -1,7 +1,6 @@
 import CommentList from "@/components/post/comment/CommentList";
 import Post from "@/components/post/Post";
 import { Box, Card, Typography } from "@mui/material";
-import { grey } from "@mui/material/colors";
 import { Container } from "@mui/system";
 // import { useParams } from "react-router-dom";
 
@@ -12,7 +11,6 @@ export default function PostPage() {
     <Box
       sx={{
         paddingY: 3,
-        bgcolor: grey[100],
       }}
     >
       <Container>

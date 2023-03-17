@@ -9,7 +9,6 @@ export default function PostWritePage() {
       sx={{
         height: "calc(100vh - 65px)",
         paddingY: 3,
-        bgcolor: grey[100],
       }}
     >
       <Container
