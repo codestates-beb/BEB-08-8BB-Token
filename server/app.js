@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
+const cookieParser = require("cookie-parser");
 const fs = require('fs');
 const https = require('https');
 const routes = require('./routes');
@@ -9,7 +10,7 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-//쿠키설정
+//세션,쿠키설정
 app.use(
   session({
     secret: '@8bbtoken',
@@ -18,7 +19,7 @@ app.use(
     cookie: {
       domain: 'localhost',
       path: '/',
-      maxAge: 24 * 6 * 60 * 10000,
+      maxAge: 20 * 60 * 1000, 
       sameSite: "none",
       httpOnly: true,
       secure: true,
@@ -26,6 +27,7 @@ app.use(
   })
 );
 
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
