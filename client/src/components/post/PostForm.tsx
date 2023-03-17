@@ -58,9 +58,10 @@ export default function PostForm() {
     <Box
       sx={{
         position: "relative",
+        width: "100%",
+        height: "100%",
         display: "flex",
         flexDirection: "column",
-        flexGrow: 1,
       }}
     >
       <TextField

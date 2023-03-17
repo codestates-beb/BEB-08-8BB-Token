@@ -11,7 +11,6 @@ export default function PostPage() {
   return (
     <Box
       sx={{
-        flexGrow: 1,
         paddingY: 3,
         bgcolor: grey[100],
       }}
