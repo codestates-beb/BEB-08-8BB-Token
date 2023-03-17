@@ -3,6 +3,7 @@ const PATH = {
   MYPAGE: "/mypage",
   FAUCET: "/faucet",
   MARKET: "/market",
+  SALE: "/market/nftsale",
 
   POST_WRITE: "/post/write",
   POST_ID: "/post/:id",

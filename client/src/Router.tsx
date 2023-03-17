@@ -9,6 +9,7 @@ import BaseLayout from "./components/layouts/BaseLayout";
 import PATH from "./constants/path";
 import PostPage from "./pages/post/PostPage";
 import PostWritePage from "./pages/post/PostWritePage";
+import NFTSale from "./pages/NFTSale";
 
 export default function Router() {
   return (
@@ -22,6 +23,7 @@ export default function Router() {
           {/* post */}
           <Route path={PATH.POST_WRITE} element={<PostWritePage />} />
           <Route path={PATH.POST_ID} element={<PostPage />} />
+          <Route path={PATH.SALE} element={<NFTSale />} />
         </Route>
         {/* auth */}
         <Route path={PATH.AUTH} element={<AuthLayout />}>
