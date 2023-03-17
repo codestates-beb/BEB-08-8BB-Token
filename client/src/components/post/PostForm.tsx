@@ -1,20 +1,25 @@
-import { Divider, TextField } from "@mui/material";
-import { Box } from "@mui/system";
+import styled from "@emotion/styled";
+import { Button, Divider, TextField, Box } from "@mui/material";
 import React, { useState } from "react";
 import PostTag from "./PostTag";
+import CreateIcon from "@mui/icons-material/Create";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import PostContent from "./PostContent";
 
 const addItems = (tags: string[], ...values: string[]) => {
-  // value가 이미 포함되어있을 경우 리턴
-  // if (tags.includes(value)) return tags;
-  // value를 추가하고 새로운 배열을 리턴
-  return [...tags, ...values];
+  const diff = values.filter((v) => !tags.includes(v));
+
+  return [...tags, ...diff];
 };
 
-const removeTag = () => {
-  //
+const removeTag = (tags: string[], value: string) => {
+  return tags.filter((v) => v !== value);
 };
 
 export default function PostForm() {
+  const [isPreview, setIsPreview] = useState<boolean>(false);
+  const [, setTitle] = useState<string>("");
+  const [content, setContent] = useState<string>("");
   const [tagValue, setTagValue] = useState<string>("");
   const [tags, setTags] = useState<string[]>([]);
 
@@ -27,19 +32,35 @@ export default function PostForm() {
   const handleTagAdd = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.code !== "Enter" && e.code !== "Comma") return;
     if (tagValue === "") return;
-    setTags((prev) => addItems(prev, tagValue));
+    const values = tagValue.split(",");
+    setTags((prev) => addItems(prev, ...values));
     setTagValue("");
   };
 
-  const handleTagDelete = (e: React.MouseEvent<HTMLElement>) => {
-    const name = e.currentTarget.dataset.name;
-    // setTags((prev) => prev.filter((v) => v === name));
+  const handleTagRemove = (name?: string) => {
+    if (!name) return;
+    setTags((prev) => removeTag(prev, name));
   };
+
+  const handlePreviewToggle = () => {
+    setIsPreview(!isPreview);
+  };
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setTitle(e.currentTarget.value);
+  };
+
+  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setContent(e.currentTarget.value);
+  };
+
   return (
     <Box
       sx={{
+        position: "relative",
         display: "flex",
         flexDirection: "column",
+        flexGrow: 1,
       }}
     >
       <TextField
@@ -52,11 +73,12 @@ export default function PostForm() {
             fontWeight: "bold",
           },
         }}
+        onChange={handleTitleChange}
       />
       <Divider sx={{ width: 100, borderWidth: 3, my: 2 }} />
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 1 }}>
         {tags.map((v, i) => (
-          <PostTag key={i} label={v} onDelete={handleTagDelete} />
+          <PostTag key={i} label={v} onDelete={handleTagRemove} />
         ))}
         <TextField
           placeholder="태그를 입력해주세요"
@@ -72,6 +94,65 @@ export default function PostForm() {
           onKeyUp={handleTagAdd}
         />
       </Box>
+      <Box
+        sx={{ display: "flex", flexDirection: "column", flexGrow: 1, mt: 3 }}
+      >
+        {isPreview ? (
+          <PostContent src={content} />
+        ) : (
+          <Content
+            placeholder="여기에 글을 입력해주세요"
+            value={content}
+            onChange={handleContentChange}
+          />
+        )}
+      </Box>
+
+      <Box
+        sx={{
+          display: "flex",
+          columnGap: 1,
+          justifyContent: "flex-end",
+          mt: 2,
+        }}
+      >
+        {isPreview ? (
+          <Button
+            type="button"
+            onClick={handlePreviewToggle}
+            startIcon={<CreateIcon />}
+            color="inherit"
+          >
+            작성하기
+          </Button>
+        ) : (
+          <Button
+            type="button"
+            onClick={handlePreviewToggle}
+            startIcon={<VisibilityIcon />}
+            color="inherit"
+          >
+            미리보기
+          </Button>
+        )}
+        <Button type="button" variant="contained" onClick={handlePreviewToggle}>
+          완료
+        </Button>
+      </Box>
     </Box>
   );
 }
+
+const Content = styled("textarea")`
+  font: inherit;
+  display: flex;
+  flex-grow: 1;
+  border: 0;
+  resize: none;
+  outline: none;
+  font-size: 18px;
+
+  ::placeholder {
+    font-size: inherit;
+  }
+`;

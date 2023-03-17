@@ -3,7 +3,10 @@ import { grey } from "@mui/material/colors";
 
 type PostTagProps = ChipProps;
 
-export default function PostTag({ ...props }: PostTagProps) {
+export default function PostTag({ onDelete, ...props }: PostTagProps) {
+  const handleDelete = () => {
+    if (onDelete) onDelete(props.label);
+  };
   return (
     <Chip
       sx={{
@@ -12,6 +15,7 @@ export default function PostTag({ ...props }: PostTagProps) {
         bgcolor: grey[100],
         fontWeight: "bold",
       }}
+      onDelete={handleDelete}
       {...props}
     />
   );

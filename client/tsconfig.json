@@ -20,6 +20,6 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src"],
+  "include": ["src", "src/pages/post/.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

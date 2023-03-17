@@ -8,7 +8,7 @@ import MarketPage from "./pages/MarketPage";
 import BaseLayout from "./components/layouts/BaseLayout";
 import PATH from "./constants/path";
 import PostPage from "./pages/post/PostPage";
-import PostForm from "./pages/post/PostForm";
+import PostWritePage from "./pages/post/PostWritePage";
 
 export default function Router() {
   return (
@@ -20,7 +20,7 @@ export default function Router() {
           <Route path={PATH.MARKET} element={<MarketPage />} />
           <Route path={PATH.FAUCET} element={<MarketPage />} />
           {/* post */}
-          <Route path={PATH.POST_WRITE} element={<PostForm />} />
+          <Route path={PATH.POST_WRITE} element={<PostWritePage />} />
           <Route path={PATH.POST_ID} element={<PostPage />} />
         </Route>
         {/* auth */}

@@ -7,13 +7,23 @@ export default function PostWritePage() {
   return (
     <Box
       sx={{
+        display: "flex",
+        flexDirection: "column",
         flexGrow: 1,
         paddingY: 3,
         bgcolor: grey[100],
       }}
     >
-      <Container>
-        <Card sx={{ p: 3 }}>
+      <Container
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          flexGrow: 1,
+        }}
+      >
+        <Card
+          sx={{ p: 3, display: "flex", flexDirection: "column", flexGrow: 1 }}
+        >
           <PostForm />
         </Card>
       </Container>
