@@ -2,7 +2,7 @@ import { Chip, ChipProps } from "@mui/material";
 import { grey } from "@mui/material/colors";
 
 interface PostTagProps extends Omit<ChipProps, "onDelete"> {
-  onDelete(label?: ChipProps["label"]): void;
+  onDelete?(label?: ChipProps["label"]): void;
 }
 
 export default function PostTag({ onDelete, ...props }: PostTagProps) {
