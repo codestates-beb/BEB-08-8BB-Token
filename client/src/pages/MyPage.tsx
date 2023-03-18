@@ -1,4 +1,4 @@
-import PostList from "@/components/main/PostList";
+import PostList from "@/components/post/PostList";
 import { Avatar, Box, Container, Tab, Tabs, Typography } from "@mui/material";
 import React, { useState } from "react";
 

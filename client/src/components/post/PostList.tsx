@@ -2,7 +2,7 @@ import PATH from "@/constants/path";
 import { Stack } from "@mui/material";
 import React from "react";
 import { Link } from "react-router-dom";
-import PostCard from "../PostCard";
+import PostCard from "./PostCard";
 
 export default function PostList() {
   return (

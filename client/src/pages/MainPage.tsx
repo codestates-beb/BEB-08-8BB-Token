@@ -1,4 +1,4 @@
-import PostList from "@/components/main/PostList";
+import PostList from "@/components/post/PostList";
 import { Box, Container } from "@mui/material";
 
 export default function MainPage() {
