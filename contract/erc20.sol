@@ -110,14 +110,6 @@ contract ICToken is ERC20Interface, OwnerHelper {
       return true;
     }
 
-    function transferERC20(address _sender, address _recipient, uint256 _amount) external virtual {     
-      require(_sender != address(0), "ERC20: transfer from the zero address");
-      require(_recipient != address(0), "ERC20: transfer to the zero address");
-      require(_balances[_sender] >= _amount, "ERC20: transfer amount exceeds balance");
-      _balances[_sender] = _balances[_sender].sub(_amount); 
-      _balances[_recipient] = _balances[_recipient].add(_amount);
-    }
-
     function allowance(address owner, address spender) external view override returns (uint256) {
       return _allowances[owner][spender];
     }
@@ -160,83 +152,63 @@ contract ICToken is ERC20Interface, OwnerHelper {
     event EditComment(uint256 commentTime);
 
     uint256 public airDropTokenPostAmount = 50;
-    uint256 public airDropTokenCommentAmount = 10; 
-    uint256 postId = 0; //postId는 1부터 시작한다. 
+    uint256 public postCount = 0; 
 
-    struct NewPost {
-        string title; // 새 포스팅의 제목.
-        string author; // 표시되는 저자명. 
-        string body; // 글의 본문. 
-        uint256 postingTime; // 글을 작성한 시간.
-        uint256 commentCount; // 0으로 시작해서 댓글을 하나 쓸때마다 1씩 더한다. 
-        bool edit; // 글을 수정하기 전에는 false. 
-    }
-    struct Comment {
-        string comment; 
-        uint256 commentTime; 
+    struct User {
+      uint256 id; 
+      string nickname; 
+      address _address; // 데이터 타입과 동일한 이름으로 선언할 수 없음. 
     }
 
-    mapping (uint256 => NewPost) postIdToNewPost; 
-    mapping (uint256 => address) postIdToAddress;
-    mapping (uint256 => mapping(uint256 => Comment)) commentIdToComment; 
-    mapping (uint256 => mapping(uint256 => address)) commentIdToAddress;
-    
+    struct Post {
+      uint256 id; 
+      uint256 user_id; 
+      string title; 
+      string content; 
+    }
 
-    function generateNewPost (string memory _title, string memory _author, string memory _body) public returns(uint256) {
-        postId = postId.add(1); 
-        postIdToNewPost[postId] = NewPost(_title, _author, _body, block.timestamp, 0, false);
-        postIdToAddress[postId] = msg.sender; 
-        address _recipient = msg.sender; 
-        _airDropTokenToGenerateNewPost(_recipient);
-        emit NewPosting(_title, _author, block.timestamp);
-        return postId.sub(1); // postId에 1을 더했기 때문에 출력하는 값은 1을 뺀 값을 출력한다.  
+    mapping (uint256 => Post) idToPost;
+    mapping (uint256 => User) idToUser;
+    mapping (address => uint256) addressToId;
+ 
+
+    function user (uint256 _id, string memory _nickname) public {
+      require(idToUser[_id].id == 0, "This ID has already been used. Please use a different ID.");
+      idToUser[_id] = User(_id, _nickname, msg.sender);
+      addressToId[msg.sender] = _id;
+    }      
+
+    function generateNewPost (uint256 _id, string memory _title, string memory _content) public returns(uint256) {
+      require(idToPost[_id].id == 0, "This ID has already been used. Please use a different ID.");
+      uint256 userId = addressToId[msg.sender]; 
+      idToPost[_id] = Post(_id, userId, _title, _content);
+      _airDropTokenToGenerateNewPost(msg.sender);
+      postCount = postCount.add(1); 
+      return _id; 
     }
 
     function _airDropTokenToGenerateNewPost (address _recipient) private {
-        address _owner = owner();
-        _transfer(_owner, _recipient, airDropTokenPostAmount);
+      address _owner = owner();
+      _transfer(_owner, _recipient, airDropTokenPostAmount);
     }
 
-    function editPost (string memory _body, uint256 _postId) public {
-        require(msg.sender == postIdToAddress[_postId]);
-        postIdToNewPost[_postId].body = _body; 
-        postIdToNewPost[_postId].postingTime = block.timestamp;
-        postIdToNewPost[_postId].edit = true;
-        emit EditPosting(block.timestamp);
+    function transferERC20(address _sender, address _recipient, uint256 _amount) external virtual {     
+      require(_sender != address(0), "ERC20: transfer from the zero address");
+      require(_recipient != address(0), "ERC20: transfer to the zero address");
+      require(_balances[_sender] >= _amount, "ERC20: transfer amount exceeds balance");
+      _balances[_sender] = _balances[_sender].sub(_amount); 
+      _balances[_recipient] = _balances[_recipient].add(_amount);
     }
 
-    function addComment (string memory _comment, uint256 _postId) public returns(uint256 commentId) {
-        commentId = postIdToNewPost[_postId].commentCount.add(1);
-        commentIdToComment[_postId][commentId].comment = _comment; 
-        commentIdToComment[_postId][commentId].commentTime = block.timestamp; 
-        commentIdToAddress[_postId][commentId] = msg.sender;
-        postIdToNewPost[_postId].commentCount.add(1);  
-        address _recipient = msg.sender; 
-        _airDropTokenToComment(_recipient);
-        emit AddComment(block.timestamp);
-    }
-
-    function _airDropTokenToComment (address _recipient) private {
-        address _owner = owner();
-        _transfer(_owner, _recipient, airDropTokenCommentAmount);
+    function addressToIdFunc(address _address) external view returns(uint256) {
+      return addressToId[_address];     
     } 
 
-    function editComment (string memory _comment, uint256 _postId, uint256 _commentId) public {
-        require(msg.sender == commentIdToAddress[_postId][_commentId]); 
-        commentIdToComment[_postId][_commentId].comment = _comment; 
-        commentIdToComment[_postId][_commentId].commentTime = block.timestamp; 
-        emit EditComment(block.timestamp);
-    }
-
-    function showPostById(uint256 _postId) public view returns(NewPost memory post) {
-        post = postIdToNewPost[_postId]; 
-    }
-
-    function showCommentById(uint256 _postId, uint256 _commentId) public view returns(Comment memory comment) {
-        comment = commentIdToComment[_postId][_commentId]; 
+    function showPostByPostId(uint256 _postId) public view returns(Post memory post) {
+      post = idToPost[_postId]; 
     }
 
     function totalPost() public view returns(uint256) {
-        return postId; 
+      return postCount; 
     }
 }

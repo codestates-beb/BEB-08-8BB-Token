@@ -9,91 +9,69 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
 import "./testERC20.sol";
 interface TestERC20Interface {
-    function balanceOf(address account) external view returns (uint256);
     function transferERC20(address _sender, address _recipient, uint256 _amount) external;
+    function addressToIdFunc(address _address) external view returns(uint256);
 } 
 
 contract MyNFTs is ERC721URIStorage, Ownable {
     using SafeMath for uint256;
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
+    TestERC20Interface token;
 
     constructor() public ERC721("8BB_NFT", "8Bb_NFT") {}
 
-    //interface 연결하는 함수.
     //erc20.sol ICToken 배포 후 erc721.sol MyNFTs 배포 
     //erc20.sol ICToken의 컨트랙트 주소를 함수에 입력하면 두 컨트랙트가 연결됩니다. 
-    TestERC20Interface erc20Contaract; 
-    function setInterface(address _address) external onlyOwner {
-        erc20Contaract = TestERC20Interface(_address); 
-    }
-
-    //잔고 확인. 함수 실행한 주소의 ERC20토큰 잔고를 보여 준다. 
-    function balanceERC20() public view returns(uint256 balance) {
-        balance = erc20Contaract.balanceOf(msg.sender);
+    function setToken(address tokenAddress) public onlyOwner returns(bool) {
+        require(tokenAddress != address(0x0));
+        token = TestERC20Interface(tokenAddress);
+        return true;  
     }
 
     // 민팅 비용 설정, 편의상 민팅 비용은 15로 설정한다. 
-    uint256 mintingFee = 15; 
-    function setMintingFee(uint256 _mintingFee) external onlyOwner returns(uint256) {
-        mintingFee = _mintingFee; 
-        return mintingFee;
+    uint256 nftPrice = 15; 
+    function setNftPrice(uint256 _nftPrice) public onlyOwner returns(uint256) {
+        nftPrice = _nftPrice; 
+        return nftPrice;
     } 
 
-    // nft 판매 정보가 담긴 구조체 
-    struct NFTInfo { 
-        uint256 price;
-        bool isForSale; // 판매 대상이 아니라면 false, 판매 중이라면 ture
+    // nft 정보 담긴 구조체  
+    struct Nft {
+        uint256 id; 
+        uint256 userId;
     }
-    mapping(uint256 => NFTInfo) tokenIdToNFTInfo;
+    mapping(uint256 => Nft) idToNft;
 
-    // 누구나 민팅할 수 있도록 onlyOwner 제거 
-    function mintNFT(string memory tokenURI)
+    // 누구나 민팅할 수 있도록 onlyOwner 제거
+    // _id는 db에서 지정하는 값이 된다.
+    // _id는 1부터 시작해야 한다.
+
+    function mintNFT(uint256 _id, string memory tokenURI)
         public
         returns (uint256)
     {
-        // NFT 민팅 할 때 mintingFee에 해당하는 금액을 contract owner에게 전송해야 한다.
-        // _owner가 민팅 할 때는 비용을 지불하지 않거나, _owner는 민팅할 수 없게 설정해야 할 것 같음. 일단은 전자로 작성함.   
+        // _recipient는 msg.sender로 한다.
+        address _recipient = msg.sender; 
+
+        // NFT 민팅 할 때 nftPrice에 해당하는 금액을 contract owner에게 전송해야 한다.
+        // _owner는 민팅할 수 없다.    
         address _owner = owner();
-        if(msg.sender != _owner){
-            erc20Contaract.transferERC20(msg.sender, _owner, mintingFee);
-        }
+        require(msg.sender != _owner, "Contract owner cannot mint NFT.");
+        require(idToNft[_id].id == 0, "This ID has already been used. Please use a different ID.");
 
+        // approve 없이 민팅 가능하게 하기 위해서 별도의 전송함수 사용한다.  
+        token.transferERC20(_recipient, _owner, nftPrice);
+        
         _tokenIds.increment();
-
-        address recipient = msg.sender; 
         uint256 newItemId = _tokenIds.current();
-        _mint(recipient, newItemId);
+        _mint(_recipient, newItemId);
         _setTokenURI(newItemId, tokenURI);
 
         // 민팅할 때 판매 정보 구조체 mapping
-        tokenIdToNFTInfo[newItemId] = NFTInfo(0, false);
+        uint256 userId = token.addressToIdFunc(msg.sender); 
+        idToNft[newItemId] = Nft(_id, userId);
 
-        return newItemId;
+        return _id;
     } 
-
-    // 판매정보 구조체 수정 
-    function sell (uint256 _tokenId, uint256 _price) public onlyOwner {
-        tokenIdToNFTInfo[_tokenId].price = _price; 
-        tokenIdToNFTInfo[_tokenId].isForSale = true; 
-    }
-
-    function tokenIdToPrice (uint256 _tokenId) public view returns(uint256 price, string memory message) {
-        if(tokenIdToNFTInfo[_tokenId].isForSale){
-            price = tokenIdToNFTInfo[_tokenId].price;
-            message = "This itms is for sale.";
-        } else {
-            price = 0; 
-            message = "This item is not for sale."; 
-        }
-    }
-  
-    // 구매자가 nft를 이동시킬 수 없음. 따라서 구매함수 만으로 nft이동시키는 것 불가.
-    // 구매 메커니즘 회의에서 결정하기. event 메커니즘 활용할 경우 백에서 처리해줘야 함.     
-    function buy (uint256 _tokenId) public {
-        require(tokenIdToNFTInfo[_tokenId].isForSale == false, "This item is not for sale.");
-        require(erc20Contaract.balanceOf(msg.sender) >= tokenIdToNFTInfo[_tokenId].price, "price exceeds balance");  
-        address _NFTOwner = _ownerOf(_tokenId); 
-        // 미완성 코드
-    }
 }
