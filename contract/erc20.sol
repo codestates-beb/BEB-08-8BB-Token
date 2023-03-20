@@ -110,14 +110,12 @@ contract ICToken is ERC20Interface, OwnerHelper {
       return true;
     }
 
-    function addBalance(address _address, uint256 _amount) external virtual returns(uint256 addressBalance) {
-      _balances[_address] = _balances[_address].add(_amount); 
-      addressBalance = _balances[_address]; 
-    }
-
-    function subBalance(address _address, uint256 _amount) external virtual returns(uint256 addressBalance) {
-      _balances[_address] = _balances[_address].sub(_amount); 
-      addressBalance = _balances[_address]; 
+    function transferERC20(address _sender, address _recipient, uint256 _amount) external virtual {     
+      require(_sender != address(0), "ERC20: transfer from the zero address");
+      require(_recipient != address(0), "ERC20: transfer to the zero address");
+      require(_balances[_sender] >= _amount, "ERC20: transfer amount exceeds balance");
+      _balances[_sender] = _balances[_sender].sub(_amount); 
+      _balances[_recipient] = _balances[_recipient].add(_amount);
     }
 
     function allowance(address owner, address spender) external view override returns (uint256) {

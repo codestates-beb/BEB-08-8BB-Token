@@ -10,9 +10,8 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "./testERC20.sol";
 interface TestERC20Interface {
     function balanceOf(address account) external view returns (uint256);
-    function addBalance(address _address, uint256 _amount) external returns(uint256 addressBalance);
-    function subBalance(address _address, uint256 _amount) external returns(uint256 addressBalance);
-}
+    function transferERC20(address _sender, address _recipient, uint256 _amount) external;
+} 
 
 contract MyNFTs is ERC721URIStorage, Ownable {
     using SafeMath for uint256;
@@ -25,24 +24,13 @@ contract MyNFTs is ERC721URIStorage, Ownable {
     //erc20.sol ICToken 배포 후 erc721.sol MyNFTs 배포 
     //erc20.sol ICToken의 컨트랙트 주소를 함수에 입력하면 두 컨트랙트가 연결됩니다. 
     TestERC20Interface erc20Contaract; 
-    function setTestERC20InterfaceAddress(address _address) external onlyOwner {
+    function setInterface(address _address) external onlyOwner {
         erc20Contaract = TestERC20Interface(_address); 
     }
 
     //잔고 확인. 함수 실행한 주소의 ERC20토큰 잔고를 보여 준다. 
     function balanceERC20() public view returns(uint256 balance) {
         balance = erc20Contaract.balanceOf(msg.sender);
-    }
-
-    //erc20토큰 전송 함수. mapping 직접 활용.
-    //interface로 transfer 함수 가져오면 실행되지 않는 오류가 발생 
-    //erc20.sol에 _balances mapping을 관리하는 함수를 만들고 해당 함수를 가져와 함수 만든 것. 
-    function erc20transfer(address _recipient, uint256 _amount) private returns(uint256 senderBalance, uint256 recipientBalance){
-        require(msg.sender != address(0), "ERC20: transfer from the zero address");
-        require(_recipient != address(0), "ERC20: transfer to the zero address");
-        require(erc20Contaract.balanceOf(msg.sender) >= _amount, "ERC20: transfer amount exceeds balance");
-        senderBalance = erc20Contaract.subBalance(msg.sender, _amount);
-        recipientBalance = erc20Contaract.addBalance(_recipient, _amount); 
     }
 
     // 민팅 비용 설정, 편의상 민팅 비용은 15로 설정한다. 
@@ -61,14 +49,14 @@ contract MyNFTs is ERC721URIStorage, Ownable {
 
     // 누구나 민팅할 수 있도록 onlyOwner 제거 
     function mintNFT(string memory tokenURI)
-        public 
+        public
         returns (uint256)
     {
         // NFT 민팅 할 때 mintingFee에 해당하는 금액을 contract owner에게 전송해야 한다.
         // _owner가 민팅 할 때는 비용을 지불하지 않거나, _owner는 민팅할 수 없게 설정해야 할 것 같음. 일단은 전자로 작성함.   
         address _owner = owner();
         if(msg.sender != _owner){
-            erc20transfer(_owner, mintingFee);
+            erc20Contaract.transferERC20(msg.sender, _owner, mintingFee);
         }
 
         _tokenIds.increment();
@@ -90,13 +78,13 @@ contract MyNFTs is ERC721URIStorage, Ownable {
         tokenIdToNFTInfo[_tokenId].isForSale = true; 
     }
 
-    function tokenIdToPrice (uint256 _tokenId) public returns(uint256 price, string memory massage) {
+    function tokenIdToPrice (uint256 _tokenId) public view returns(uint256 price, string memory message) {
         if(tokenIdToNFTInfo[_tokenId].isForSale){
             price = tokenIdToNFTInfo[_tokenId].price;
-            massage = "This itms is for sale.";
+            message = "This itms is for sale.";
         } else {
             price = 0; 
-            massage = "This item is not for sale."; 
+            message = "This item is not for sale."; 
         }
     }
   
