@@ -38,8 +38,8 @@ contract MyNFTs is ERC721URIStorage, Ownable {
     //interface로 transfer 함수 가져오면 실행되지 않는 오류가 발생 
     //erc20.sol에 _balances mapping을 관리하는 함수를 만들고 해당 함수를 가져와 함수 만든 것. 
     function erc20transfer(address _recipient, uint256 _amount) private returns(uint256 senderBalance, uint256 recipientBalance){
-        require(sender != address(0), "ERC20: transfer from the zero address");
-        require(recipient != address(0), "ERC20: transfer to the zero address");
+        require(msg.sender != address(0), "ERC20: transfer from the zero address");
+        require(_recipient != address(0), "ERC20: transfer to the zero address");
         require(erc20Contaract.balanceOf(msg.sender) >= _amount, "ERC20: transfer amount exceeds balance");
         senderBalance = erc20Contaract.subBalance(msg.sender, _amount);
         recipientBalance = erc20Contaract.addBalance(_recipient, _amount); 
@@ -79,7 +79,7 @@ contract MyNFTs is ERC721URIStorage, Ownable {
         _setTokenURI(newItemId, tokenURI);
 
         // 민팅할 때 판매 정보 구조체 mapping
-        tokenIdToNFTInfo[newItemId] = ForSale(0, false);
+        tokenIdToNFTInfo[newItemId] = NFTInfo(0, false);
 
         return newItemId;
     } 
@@ -90,20 +90,22 @@ contract MyNFTs is ERC721URIStorage, Ownable {
         tokenIdToNFTInfo[_tokenId].isForSale = true; 
     }
 
-    function tokenIdToPrice (uint256 _tokenId) public returns(uint256, string memory) {
+    function tokenIdToPrice (uint256 _tokenId) public returns(uint256 price, string memory massage) {
         if(tokenIdToNFTInfo[_tokenId].isForSale){
-            return tokenIdToNFTInfo[_tokenId].price; 
+            price = tokenIdToNFTInfo[_tokenId].price;
+            massage = "This itms is for sale.";
         } else {
-            return "This item is not for sale."; 
+            price = 0; 
+            massage = "This item is not for sale."; 
         }
     }
   
     // 구매자가 nft를 이동시킬 수 없음. 따라서 구매함수 만으로 nft이동시키는 것 불가.
     // 구매 메커니즘 회의에서 결정하기. event 메커니즘 활용할 경우 백에서 처리해줘야 함.     
-    function buy (uint256 _saleId) public {
+    function buy (uint256 _tokenId) public {
         require(tokenIdToNFTInfo[_tokenId].isForSale == false, "This item is not for sale.");
         require(erc20Contaract.balanceOf(msg.sender) >= tokenIdToNFTInfo[_tokenId].price, "price exceeds balance");  
-        address _NFTOwner = _ownerOf(forsale[_saleId].tokenId); 
+        address _NFTOwner = _ownerOf(_tokenId); 
         // 미완성 코드
     }
 }
