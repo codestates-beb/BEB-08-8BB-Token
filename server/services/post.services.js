@@ -4,7 +4,7 @@ module.exports = {
   post_mainById_get: async (id) => {
     try {
       const result = await post.findAll({
-        attributes: ['id', 'title', 'content', 'createdAt', 'updatedAt', ['user_id', 'userId']],
+        attributes: ['id', 'title', 'content', 'hits', 'createdAt', 'updatedAt', ['user_id', 'userId']],
         include: [{
            model: user,     
            attributes: ['nickname']
@@ -22,7 +22,8 @@ module.exports = {
       const result = await post.create({
         user_id: userId,
         title: title,
-        content: content
+        content: content,
+        hits: 0
       });
       return result;
     } catch (e) {
