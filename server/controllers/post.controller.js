@@ -7,6 +7,11 @@ module.exports = {
   post_mainById_get: async (req, res) => {
     const result = await post.post_mainById_get(req.params.id);    
     if(result) {
+      //게시글을 찾을 수 없을때
+      if(result.length === 0 ) {
+        res.status(404).send({message: "not found list"});
+        return;
+      }
       let filterdResult = [];
       for(obj of result) {
         let objcpy = {...obj.dataValues}
@@ -26,7 +31,7 @@ module.exports = {
   post_main_post: async (req, res) => {
     //로그인 체크
     if(!req.session.userData 
-      || req.session.userData.id !== req.body.user_id
+      || req.session.userData.id !== req.body.userId
       ) {
       res.status(401).send({message: "error. not logged in"});
       return;
