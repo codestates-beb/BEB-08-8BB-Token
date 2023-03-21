@@ -1,214 +1,110 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity ^0.8.0; // 라이브러리 사용으로 인한 버전 수정 0.7.0 => 0.8.0
 
-interface ERC20Interface {
-    function totalSupply() external view returns (uint256);
-    function balanceOf(address account) external view returns (uint256);
-    function transfer(address recipient, uint256 amount) external returns (bool);
-    function approve(address spender, uint256 amount) external returns (bool);
-    function allowance(address owner, address spender) external view returns (uint256);
-    function transferFrom(address spender, address recipient, uint256 amount) external returns (bool);
+import "@openzeppelin/contracts/utils/math/SafeMath.sol"; // 계산
 
-    event Transfer(address indexed from, address indexed to, uint256 amount);
-    event Transfer(address indexed spender, address indexed from, address indexed to, uint256 amount);
-    event Approval(address indexed owner, address indexed spender, uint256 oldAmount, uint256 amount);
-}
+// 활성화
+// TypeError: Contract "ICToken" should be marked as abstract. => 위의 interface와 ICToken의 상속에 있어서 함수 설정이 맞아야 한다.
+contract ICToken {
+    using SafeMath for uint256; // 라이브러리 상속 설정
 
-abstract contract OwnerHelper {
-  	address private _owner;
+    event erc20Transfer(
+        address indexed from,
+        address indexed to,
+        uint256 amount
+    ); // event 설정
 
-  	event OwnershipTransferred(address indexed preOwner, address indexed nextOwner);
+    mapping(address => uint256) private _tokenbalances;
+    //mapping (address => mapping (address => uint256)) public _allowances; /// 누가 누구에서 얼만큼의 토큰을 허락했는가
 
-  	modifier onlyOwner {
-			require(msg.sender == _owner, "OwnerHelper: caller is not owner");
-			_;
-  	}
-
-  	constructor() {
-      _owner = msg.sender;
-  	}
-
-    function owner() public view virtual returns (address) {
-      return _owner;
-    }
-
-  	function transferOwnership(address newOwner) onlyOwner public {
-      require(newOwner != _owner);
-      require(newOwner != address(0x0));
-      address preOwner = _owner;
-	    _owner = newOwner;
-	    emit OwnershipTransferred(preOwner, newOwner);
-  	}
-}
-
-library SafeMath {
-  	function mul(uint256 a, uint256 b) internal pure returns (uint256) {
-			uint256 c = a * b;
-			assert(a == 0 || c / a == b);
-			return c;
-  	}
-
-  	function div(uint256 a, uint256 b) internal pure returns (uint256) {
-	    uint256 c = a / b;
-			return c;
-  	}
-
-  	function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-			assert(b <= a);
-			return a - b;
-  	}
-
-  	function add(uint256 a, uint256 b) internal pure returns (uint256) {
-			uint256 c = a + b;
-			assert(c >= a);
-			return c;
-	}
-}
-
-contract ICToken is ERC20Interface, OwnerHelper {
-    using SafeMath for uint256;
-
-    mapping (address => uint256) public _balances;
-    mapping (address => mapping (address => uint256)) public _allowances;
-
-    uint256 public _totalSupply;
-    string public _name;
-    string public _symbol;
-    uint8 public _decimals;
+    uint256 public _tokenTotalSupply;
+    string public _tokenName;
+    string public _tokenSymbol;
+    uint8 public _tokenDecimals;
+    address private tokenOwner;
 
     constructor() {
-      _name = "8BB";
-      _symbol = "8BB";
-      _decimals = 3;
-      _totalSupply = 100000000;
-      _balances[msg.sender] = _totalSupply;
+        _tokenName = "8BB";
+        _tokenSymbol = "8BB";
+        _tokenDecimals = 3;
+        _tokenTotalSupply = 10000000000;
+        _tokenbalances[msg.sender] = _tokenTotalSupply;
+        tokenOwner = msg.sender;
     }
 
-    function name() public view returns (string memory) {
-      return _name;
+    function tokenName() public view returns (string memory) {
+        return _tokenName;
     }
 
-    function symbol() public view returns (string memory) {
-      return _symbol;
+    function tokenSymbol() public view returns (string memory) {
+        return _tokenSymbol;
     }
 
-    function decimals() public view returns (uint8) {
-      return _decimals;
+    function tokenDecimals() public view returns (uint8) {
+        return _tokenDecimals;
     }
 
-    function totalSupply() external view virtual override returns (uint256) {
-      return _totalSupply;
+    function tokenTotalSupply() external view returns (uint256) {
+        return _tokenTotalSupply;
     }
 
-    function balanceOf(address account) external view virtual override returns (uint256) {
-      return _balances[account];
+    function tokenBalanceOf(address account) external view returns (uint256) {
+        return _tokenbalances[account];
     }
 
-    function transfer(address recipient, uint amount) public virtual override returns (bool) {
-      _transfer(msg.sender, recipient, amount);
-      emit Transfer(msg.sender, recipient, amount);
-      return true;
+    function erc20transfer(address recipient, uint amount) public {
+        require(_tokenbalances[msg.sender] >= amount, "Not enough tokens"); // 토큰이 부족할 시 오류 메세지 전달
+        _erc20Transfer(msg.sender, recipient, amount);
+        emit erc20Transfer(msg.sender, recipient, amount);
     }
 
-    function allowance(address owner, address spender) external view override returns (uint256) {
-      return _allowances[owner][spender];
+    function erc20transferFromOwner(address recipient, uint amount) internal {
+        // 외부에서 해당 함수에 접근하지 못하도록 설정 => internal
+        require(_tokenbalances[tokenOwner] >= amount, "Not enough tokens"); // 토큰이 부족할 시 오류 메세지 전달
+        _erc20Transfer(tokenOwner, recipient, amount);
+        emit erc20Transfer(tokenOwner, recipient, amount);
     }
 
-    function approve(address spender, uint amount) external virtual override returns (bool) {
-      uint256 currentAllowance = _allowances[msg.sender][spender];
-      require(_balances[msg.sender] >= amount,"ERC20: The amount to be transferred exceeds the amount of tokens held by the owner.");
-      _approve(msg.sender, spender, currentAllowance, amount);
-      return true;
+    // function allowance(address spender) external view returns (uint256) { // 설정된 owner에 의해 작동되도록 수정
+    //   return _allowances[owner][spender];
+    // }
+
+    // function approve(address spender, uint amount) external virtual override returns (bool) { // 설정된 owner에 의해 작동되도록 수정
+    //   uint256 currentAllowance = _allowances[owner][spender];
+    //   require(_balances[owner] >= amount,"ERC20: The amount to be transferred exceeds the amount of tokens held by the owner.");
+    //   _approve(owner, spender, currentAllowance, amount); /// spender에게 서버로부터 부여된 양만큼 토큰을 인출할 권리 부여
+    //   return true;
+    // }
+
+    // function transferFrom(address recipient, uint256 amount) external virtual override returns (bool) {
+    //   _transfer(owner, recipient, amount);
+    //   emit Transfer(owner, recipient, amount);
+    //   uint256 currentAllowance = _allowances[sender][msg.sender];
+    //   require(currentAllowance >= amount, "ERC20: transfer amount exceeds allowance");
+    //   _approve(sender, msg.sender, currentAllowance, currentAllowance - amount);
+    //   return true;
+    // }
+
+    function _erc20Transfer(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) internal virtual {
+        require(sender != address(0), "ERC20: transfer from the zero address");
+        require(recipient != address(0), "ERC20: transfer to the zero address");
+        uint256 senderBalance = _tokenbalances[sender];
+        require(
+            senderBalance >= amount,
+            "ERC20: transfer amount exceeds balance"
+        );
+        _tokenbalances[sender] = senderBalance.sub(amount);
+        _tokenbalances[recipient] = _tokenbalances[recipient].add(amount);
     }
 
-    function transferFrom(address sender, address recipient, uint256 amount) external virtual override returns (bool) {
-      _transfer(sender, recipient, amount);
-      emit Transfer(msg.sender, sender, recipient, amount);
-      uint256 currentAllowance = _allowances[sender][msg.sender];
-      require(currentAllowance >= amount, "ERC20: transfer amount exceeds allowance");
-      _approve(sender, msg.sender, currentAllowance, currentAllowance - amount);
-      return true;
-    }
-
-    function _transfer(address sender, address recipient, uint256 amount) internal virtual {
-      require(sender != address(0), "ERC20: transfer from the zero address");
-      require(recipient != address(0), "ERC20: transfer to the zero address");
-      uint256 senderBalance = _balances[sender];
-      require(senderBalance >= amount, "ERC20: transfer amount exceeds balance");
-      _balances[sender] = senderBalance.sub(amount);
-      _balances[recipient] = _balances[recipient].add(amount);
-    }
-
-    function _approve(address owner, address spender, uint256 currentAmount, uint256 amount) internal virtual {
-      require(owner != address(0), "ERC20: approve from the zero address");
-      require(spender != address(0), "ERC20: approve to the zero address");
-      _allowances[owner][spender] = amount;
-      emit Approval(owner, spender, currentAmount, amount);
-    }
-
-    event NewPosting(string title, string author, uint256 postingTime);
-    event EditPosting(uint256 postingTime); 
-    event AddComment(uint256 commentTime); 
-    event EditComment(uint256 commentTime);
-
-    uint256 public airDropTokenPostAmount = 50;
-    uint256 public postCount = 0; 
-
-    struct User {
-      uint256 id; 
-      string nickname; 
-      address _address; // 데이터 타입과 동일한 이름으로 선언할 수 없음. 
-    }
-
-    struct Post {
-      uint256 id; 
-      uint256 user_id; 
-      string title; 
-      string content; 
-    }
-
-    mapping (uint256 => Post) idToPost;
-    mapping (uint256 => User) idToUser;
-    mapping (address => uint256) addressToId;
- 
-
-    function user (uint256 _id, string memory _nickname) public {
-      require(idToUser[_id].id == 0, "This ID has already been used. Please use a different ID.");
-      idToUser[_id] = User(_id, _nickname, msg.sender);
-      addressToId[msg.sender] = _id;
-    }      
-
-    function generateNewPost (uint256 _id, string memory _title, string memory _content) public returns(uint256) {
-      require(idToPost[_id].id == 0, "This ID has already been used. Please use a different ID.");
-      uint256 userId = addressToId[msg.sender]; 
-      idToPost[_id] = Post(_id, userId, _title, _content);
-      _airDropTokenToGenerateNewPost(msg.sender);
-      postCount = postCount.add(1); 
-      return _id; 
-    }
-
-    function _airDropTokenToGenerateNewPost (address _recipient) private {
-      address _owner = owner();
-      _transfer(_owner, _recipient, airDropTokenPostAmount);
-    }
-
-    function transferERC20(address _sender, address _recipient, uint256 _amount) external virtual {     
-      require(_sender != address(0), "ERC20: transfer from the zero address");
-      require(_recipient != address(0), "ERC20: transfer to the zero address");
-      require(_balances[_sender] >= _amount, "ERC20: transfer amount exceeds balance");
-      _balances[_sender] = _balances[_sender].sub(_amount); 
-      _balances[_recipient] = _balances[_recipient].add(_amount);
-    }
-
-    function addressToIdFunc(address _address) external view returns(uint256) {
-      return addressToId[_address];     
-    } 
-
-    function showPostByPostId(uint256 _postId) public view returns(Post memory post) {
-      post = idToPost[_postId]; 
-    }
-
-    function totalPost() public view returns(uint256) {
-      return postCount; 
-    }
+    // function _approve(address owner, address spender, uint256 currentAmount, uint256 amount) internal virtual {
+    //   require(owner != address(0), "ERC20: approve from the zero address");
+    //   require(spender != address(0), "ERC20: approve to the zero address");
+    //   _allowances[owner][spender] = amount;
+    //   emit Approval(owner, spender, currentAmount, amount);
+    // }
 }
