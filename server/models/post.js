@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
     },    
     title: DataTypes.STRING,
     content: DataTypes.STRING,
-    token_id: DataTypes.INTEGER,
+    hits: DataTypes.INTEGER,
     tx_hash: DataTypes.STRING
   }, {
     sequelize,

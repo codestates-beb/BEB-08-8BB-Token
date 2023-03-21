@@ -23,7 +23,7 @@ module.exports = {
       content: {
         type: Sequelize.STRING
       },
-      token_id: {
+      hits: {
         type: Sequelize.INTEGER
       },
       tx_hash: {
