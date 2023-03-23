@@ -25,7 +25,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       eth_amount: {
-        type: Sequelize.INTEGER
+        type: Sequelize.FLOAT
       },
       createdAt: {
         allowNull: false,

@@ -4,8 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js",
+    "start": "node --no-experimental-fetch app.js",
+    "dev": "nodemon --no-experimental-fetch app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "8bb-token",
