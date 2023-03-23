@@ -33,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     address: DataTypes.STRING,
     token_amount: DataTypes.INTEGER,
-    eth_amount: DataTypes.INTEGER
+    eth_amount: DataTypes.FLOAT
   }, {
     sequelize,
     modelName: 'user',
