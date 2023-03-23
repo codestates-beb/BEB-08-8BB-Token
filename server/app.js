@@ -5,10 +5,28 @@ const cookieParser = require("cookie-parser");
 const fs = require('fs');
 const https = require('https');
 const routes = require('./routes');
+const erc20 = require('./services/web3.erc20.services');
+const erc721 = require('./services/web3.erc721.services');
+const dataStore = require('./services/web3.datastore.services');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 4000;
+
+//init
+(async() => {
+  try {
+    const re1 = await erc721.setToken(process.env.ERC20_CONTRACT_ADDRESS);
+    const re2 = await erc20.setDataStore(process.env.DATASTORE_CONTRACT_ADDRESS);
+    const re3 = await erc721.setDataStore(process.env.DATASTORE_CONTRACT_ADDRESS);
+    const re4 = await dataStore.approve(process.env.ERC20_CONTRACT_ADDRESS);
+    const re5 = await dataStore.approve(process.env.ERC721_CONTRACT_ADDRESS);
+    if(!re1 || !re2 || !re3 || !re4 || !re5) throw new Error('init error!');
+    console.log("init success!")
+  } catch (e) {
+    console.log(e);
+  }
+})();
 
 //세션,쿠키설정
 app.use(
