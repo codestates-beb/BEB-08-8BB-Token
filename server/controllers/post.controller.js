@@ -1,4 +1,8 @@
 const post = require('../services/post.services');
+const { sequelize } = require('../models');
+const { user_amountUpdate } = require('./common.controller');
+const { postSet } = require('../services/web3.erc20.services');
+const { getPostData } = require('../services/web3.datastore.services');
 
 module.exports = {
   post_main_get: (req, res) => {
@@ -33,14 +37,37 @@ module.exports = {
     if(!req.session.userData 
       || req.session.userData.id !== req.body.userId
       ) {
-      res.status(401).send({message: "error. not logged in"});
+      return res.status(401).send({message: "error. not logged in"});
+    }
+    try {
+      await sequelize.transaction(async(tx) => {
+        //DB저장
+        const result = await post.post_main_post(req.body.title, req.body.content, req.body.userId, null, tx);
+        if(!result) {
+          res.status(400).send({message: "error"});
+          throw new Error('error');
+        }
+        //토큰전송
+        const tokenAmount = 10;
+        const postSetReceipt = await postSet(
+          req.session.userData.address, tokenAmount, //토큰 전송용
+          result.id, result.user_id, result.title ? result.title: "", result.content ? result.content: "", result.hits ? result.hits: 0 //블록체인 저장용
+          );
+        if(!postSetReceipt) {
+          res.status(503).send({message: "error. token transfer failed"});
+          throw new Error('error. token transfer failed');
+        }
+        const getPost = await getPostData(result.id); //체인데이터 저장 확인
+        console.log(getPost);
+        //정보 업데이트
+        await user_amountUpdate(req.session.userData.id, req.session.userData.address, tx);
+        await post.post_update({id: result.id, tx_hash: postSetReceipt.transactionHash}, tx);
+
+        return res.status(200).send({message: "success"});         
+      });
+    } catch (e) {
+      console.log(e);
       return;
-    }
-    const result = await post.post_main_post(req.body.title, req.body.content, req.body.userId);
-    if(result) {
-      res.status(200).send({message: "success"});
-    } else {
-      res.status(400).send({message: "error"});
-    }
-  }
+    }  
+  }  
 }
