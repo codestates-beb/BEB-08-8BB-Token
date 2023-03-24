@@ -15,15 +15,16 @@ export default function JoinPage() {
   const [userData, setUserData] = useRecoilState(userDataAtom);
   const [nameValue, setNameValue] = useState("");
   const [pwValue, setPwValue] = useState("");
-  const [isNameValid, setIsNameValid] = useState(false);
+  const [isNameValid, setIsNameValid] = useState(false); //닉네임 중복확인
 
   const btnDisabled = !nameValue || !pwValue;
 
   let timer: any;
+
   const handleName = (e: any) => {
     clearTimeout(timer);
     timer = setTimeout(() => {
-      setIsNameValid(e.target.value);
+      setNameValue(e.target.value);
       const checkDuplicate = userData.every(
         (el: { userInfo: { email: any } }) =>
           el.userInfo.email != e.target.value
@@ -37,11 +38,17 @@ export default function JoinPage() {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
+    const newUserData = new FormData(event.currentTarget);
     console.log({
-      email: data.get("email"),
-      password: data.get("password"),
+      name: newUserData.get("nickname"),
+      password: newUserData.get("password"),
     });
+    setUserData([...userData, newUserData]);
+    alert("회원가입이 완료되었습니다.");
+    localStorage.setItem(
+      "userData",
+      JSON.stringify([...userData, newUserData])
+    );
   };
 
   return (
