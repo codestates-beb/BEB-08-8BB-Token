@@ -1,4 +1,8 @@
-import * as React from "react";
+import React, { useState } from "react";
+
+import { useRecoilState } from "recoil";
+import { userDataAtom } from "@/state/atom";
+
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import { Link } from "react-router-dom";
@@ -8,6 +12,29 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 
 export default function JoinPage() {
+  const [userData, setUserData] = useRecoilState(userDataAtom);
+  const [nameValue, setNameValue] = useState("");
+  const [pwValue, setPwValue] = useState("");
+  const [isNameValid, setIsNameValid] = useState(false);
+
+  const btnDisabled = !nameValue || !pwValue;
+
+  let timer: any;
+  const handleName = (e: any) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      setIsNameValid(e.target.value);
+      const checkDuplicate = userData.every(
+        (el: { userInfo: { email: any } }) =>
+          el.userInfo.email != e.target.value
+      );
+    }, 500);
+  };
+
+  const handlePw = (e: { target: { value: React.SetStateAction<string> } }) => {
+    setPwValue(e.target.value);
+  };
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -41,6 +68,7 @@ export default function JoinPage() {
                 id="name"
                 label="Nickname"
                 autoFocus
+                onChange={handleName}
               />
               <Button type="submit" variant="contained" sx={{ mt: 3, mb: 2 }}>
                 Is duplicate?
@@ -55,6 +83,7 @@ export default function JoinPage() {
                 type="password"
                 id="password"
                 autoComplete="new-password"
+                onChange={handlePw}
               />
             </Grid>
           </Grid>
@@ -63,6 +92,7 @@ export default function JoinPage() {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
+            disabled={btnDisabled}
           >
             Sign Up
           </Button>

@@ -15,11 +15,14 @@
     "@mui/icons-material": "^5.11.11",
     "@mui/material": "^5.11.12",
     "@mui/styled-engine": "^5.11.11",
+    "@thirdweb-dev/react": "^3.10.3",
+    "@thirdweb-dev/storage": "^1.1.0",
     "marked": "^4.2.12",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.9.0",
-    "recoil": "^0.7.7"
+    "recoil": "^0.7.7",
+    "web3.storage": "^4.5.4"
   },
   "devDependencies": {
     "@types/marked": "^4.0.8",
