@@ -22,7 +22,8 @@ module.exports = {
   sendEther: async (toAddr, amount) => {
     try {       
       const accounts = await web3.eth.getAccounts();
-      for(let i = 1; i < 9; i++) {
+      const accountsLen = accounts.length > 10 ? 10 : accounts.length;
+      for(let i = 1; i < accountsLen; i++) {
         //이더확인 
         let balance = await web3.eth.getBalance(accounts[i]);
         balance = await web3.utils.fromWei(balance, "ether");
