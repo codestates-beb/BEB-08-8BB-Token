@@ -34,7 +34,7 @@ module.exports = {
     try {
       await sequelize.transaction(async(tx) => {
         //DB저장
-        const result = await market.market_main_post(req.body.user_id, req.body.title, req.body.img_url, req.body.comment, null, null, tx );
+        const result = await market.market_main_post(req.body.user_id, req.body.title, req.body.img_url, req.body.comment, req.body.token_uri, null, null, tx );
         if(!result) {
           res.status(400).send({message: "error"});
           throw new Error('error');
@@ -44,7 +44,7 @@ module.exports = {
         const approveTxhash = await approve(process.env.ERC721_CONTRACT_ADDRESS, tokenAmount, req.session.userData.address, req.session.userData.password);  
         //NFT민트
         const mintSetReceipt = await mintSet(
-          req.session.userData.address, "tokenURI",
+          req.session.userData.address, req.body.token_uri ? req.body.token_uri : "",
           result.id, result.user_id
           );
         if(!mintSetReceipt) {
