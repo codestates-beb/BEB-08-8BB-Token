@@ -41,6 +41,16 @@ module.exports = {
       console.log(e);
       return null;
     }
+  },
+  transfer: async (toAddr, tokenAmount, fromAddr, fromPassword) => {
+    try {
+      const data = await erc20Contract.methods.transfer(toAddr, tokenAmount).encodeABI();
+      const result = await personalSendTx(data, process.env.ERC20_CONTRACT_ADDRESS, fromAddr, fromPassword);
+      return result;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
   }
 }
 
