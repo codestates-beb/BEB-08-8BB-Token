@@ -26,6 +26,9 @@ module.exports = {
       comment: {
         type: Sequelize.STRING
       },
+      token_uri: {
+        type: Sequelize.STRING,
+      },
       token_id: {
         type: Sequelize.INTEGER
       },
